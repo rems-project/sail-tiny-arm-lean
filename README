@@ -1,0 +1,6 @@
+Automatically generated Sail Tiny Arm specification in Lean.
+
+Work-in-progress, currently uses hard-coded non-HEAD commits for
+sail and sail-tiny-arm.
+
+Based on https://github.com/opencompl/sail-riscv-lean
