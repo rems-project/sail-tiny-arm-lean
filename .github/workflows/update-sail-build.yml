@@ -20,8 +20,8 @@ jobs:
 
     - name: System dependencies
       run: |
-        apt update
-        apt install -y build-essential pkg-config libgmp-dev z3 cvc4 opam curl bash wget
+        sudo apt-get update
+        sudo apt-get install -y build-essential pkg-config libgmp-dev z3 cvc4 opam curl bash wget
 
     - name: Checkout SAIL
       run: |
