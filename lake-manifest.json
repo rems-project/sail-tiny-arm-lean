@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "86a5269f1a1be2e7c00ae485b3be11294967727d",
+   "rev": "be17410bd7969c130e7dcee237d56abef572feeb",
    "name": "Sail",
    "manifestFile": "lake-manifest.json",
    "inputRev": "archsem-lean",
