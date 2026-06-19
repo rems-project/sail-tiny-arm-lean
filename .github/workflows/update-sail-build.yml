@@ -90,7 +90,9 @@ jobs:
       id: run-lake
       run: |
         source ~/.profile
-        cd sail-tiny-arm/lean-snapshot/out
+
+        cp -r README .github .editorconfig sail-tiny-arm/lean-snapshot/out/
+        cd sail-tiny-arm/lean-snapshot/out/
         lake update
         lake build | tee build_log.txt
         cd ../../..
