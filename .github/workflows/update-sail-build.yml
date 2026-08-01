@@ -25,10 +25,7 @@ jobs:
 
     - name: Checkout SAIL
       run: |
-        #git clone https://github.com/rems-project/sail.git
-        # TODO: Move to mainline sail when it gets merged in
-        git clone https://github.com/ineol/sail.git
-        (cd sail ; git checkout ineol/push-npmxwlqwxxur)
+        git clone https://github.com/rems-project/sail.git
 
     - name: Restore cached opam
       id: cache-opam-restore
@@ -67,8 +64,6 @@ jobs:
       run: |
         git clone https://github.com/rems-project/sail-tiny-arm.git
         cd sail-tiny-arm
-        # TODO: update to latest sail-tiny-arm when its working.
-        git checkout 8f17b71497fa2e4f8b275194989b6dbbc55dc97e
         eval $(opam config env)
         make lean
         cd ..
