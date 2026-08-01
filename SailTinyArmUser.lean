@@ -1,5 +1,5 @@
-import Out.Registers
-import Out.TinyArm
+import SailTinyArmUser.Registers
+import SailTinyArmUser.TinyArm
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -7,13 +7,21 @@ set_option linter.unusedVariables false
 set_option match.ignoreUnusedAlts true
 
 open Sail
+open Sail.ArchSem
+
+namespace SailTinyArmUser
+
 open ArchSem
 
-namespace Out.Functions
+open Defs
+namespace Functions
 
+open shift_type
 open option
 open operand
-open move_operand
+open extend_type
+open cond
+open bitwise_op
 open ast
 open VARange
 open TLBIOp
@@ -75,8 +83,10 @@ def initialize_registers (_ : Unit) : SailM Unit := do
   writeReg R2 (← (undefined_bitvector 64))
   writeReg R1 (← (undefined_bitvector 64))
   writeReg R0 (← (undefined_bitvector 64))
+  writeReg NZCV (← (undefined_bitvector 4))
+  writeReg SP_EL0 (← (undefined_bitvector 64))
 
 def sail_model_init (x_0 : Unit) : SailM Unit := do
   (initialize_registers ())
 
-end Out.Functions
+end SailTinyArmUser.Functions

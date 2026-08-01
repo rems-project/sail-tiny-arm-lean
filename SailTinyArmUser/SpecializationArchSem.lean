@@ -1,9 +1,11 @@
 import Sail
-import Out.Defs
+import SailTinyArmUser.Defs
 
-namespace Sail
+open Sail ArchSem
 
-open Sail.ArchSem
+namespace SailTinyArmUser
+
+open Defs
 
 @[simp_sail]
 def sailTryCatch (e : SailM α) (h : exception → SailM α) : SailM α := PreSail.sailTryCatch e h
@@ -12,22 +14,14 @@ def sailTryCatch (e : SailM α) (h : exception → SailM α) : SailM α := PreSa
 def sailThrow (e : exception) : SailM α := PreSail.sailThrow e
 
 abbrev undefined_unit (_ : Unit) : SailM Unit := PreSail.undefined_unit ()
-
 abbrev undefined_bit (_ : Unit) : SailM (BitVec 1) := PreSail.undefined_bit ()
-
 abbrev undefined_bool (_ : Unit) : SailM Bool := PreSail.undefined_bool ()
-
-abbrev undefined_int (_ : Unit) : SailM Int := throw Error.InfiniteNondeterminisim
-
 abbrev undefined_range (low high : Int) : SailM Int := PreSail.undefined_range low high
-
-abbrev undefined_nat (_ : Unit) : SailM Nat := throw Error.InfiniteNondeterminisim
-
-abbrev undefined_string (_ : Unit) : SailM String := throw Error.InfiniteNondeterminisim
-
 abbrev undefined_bitvector (n : Nat) : SailM (BitVec n) := PreSail.undefined_bitvector n
-
-abbrev undefined_vector (n : Nat) (a : α) : SailM (Vector α n) := throw Error.InfiniteNondeterminisim
+abbrev undefined_int (_ : Unit) : SailM Int := PreSail.undefined_int ()
+abbrev undefined_nat (_ : Unit) : SailM Nat := PreSail.undefined_nat ()
+abbrev undefined_string (_ : Unit) : SailM String := PreSail.undefined_string ()
+abbrev undefined_vector (n : Nat) (a : α) : SailM (Vector α n) := PreSail.undefined_vector n a
 
 abbrev internal_pick {α : Type} : List α → SailM α := PreSail.internal_pick
 
@@ -35,7 +29,7 @@ abbrev writeReg (reg : Register) (v : RegisterType reg) : SailM PUnit := PreSail
 
 abbrev readReg (reg : Register) : SailM (RegisterType reg) := PreSail.readReg reg
 
-abbrev RegisterRef := @PreSail.RegisterRef
+abbrev RegisterRef := @Sail.ArchSem.RegisterRef
 
 abbrev readRegRef (reg_ref : RegisterRef α) : SailM α := PreSail.readRegRef reg_ref
 
@@ -47,23 +41,21 @@ abbrev assert (p : Bool) (s : String) : SailM Unit := PreSail.assert p s
 
 namespace ArchSem
 
-open Sail.ArchSem
-
 abbrev sail_mem_read (req : Mem_request n nt Arch.addr_size Arch.addr_space Arch.mem_acc) :
     SailM (Result ((Vector (BitVec 8) n) × (Vector Bool nt)) Arch.abort) :=
   PreSail.sail_mem_read req
 
-def sail_mem_write  (req : Mem_request n nt Arch.addr_size Arch.addr_space Arch.mem_acc) (valueBytes : Vector (BitVec 8) n) (tags : Vector Bool nt) :
+def sail_mem_write (req : Mem_request n nt Arch.addr_size Arch.addr_space Arch.mem_acc) (valueBytes : Vector (BitVec 8) n) (tags : Vector Bool nt) :
     SailM (Result (Option Bool) Arch.abort) := do
   PreSail.sail_mem_write req valueBytes tags
 
-abbrev sail_sys_reg_read  (id : Arch.sys_reg_id) (r : RegisterRef α) : SailM α :=
+abbrev sail_sys_reg_read (id : Arch.sys_reg_id) (r : RegisterRef α) : SailM α :=
   PreSail.sail_sys_reg_read id r
 
-abbrev sail_sys_reg_write  (id : Arch.sys_reg_id) (r : RegisterRef α) (v : α) : SailM Unit :=
+abbrev sail_sys_reg_write (id : Arch.sys_reg_id) (r : RegisterRef α) (v : α) : SailM Unit :=
   PreSail.sail_sys_reg_write id r v
 
-abbrev sail_mem_address_announce  (ann : Mem_request n nt Arch.addr_size Arch.addr_space Arch.mem_acc) : SailM Unit :=
+abbrev sail_mem_address_announce (ann : Mem_request n nt Arch.addr_size Arch.addr_space Arch.mem_acc) : SailM Unit :=
   PreSail.sail_mem_address_announce ann
 
 abbrev sail_barrier (b : Arch.barrier) : SailM Unit := PreSail.sail_barrier b
@@ -77,22 +69,13 @@ abbrev sail_return_exception (a : Unit) : SailM Unit := PreSail.sail_return_exce
 end ArchSem
 
 abbrev cycle_count (a : Unit) : SailM Unit := PreSail.cycle_count a
-
 abbrev get_cycle_count (a : Unit) : SailM Nat := PreSail.get_cycle_count a
-
-
 abbrev print_effect (str : String) : SailM Unit := PreSail.print_effect str
-
 abbrev print_int_effect (str : String) (n : Int) : SailM Unit := PreSail.print_int_effect str n
-
 abbrev print_bits_effect {w : Nat} (str : String) (x : BitVec w) : SailM Unit := PreSail.print_bits_effect str x
-
 abbrev print_endline_effect (str : String) : SailM Unit := PreSail.print_endline_effect str
 
 def SailME.run (m : SailME α α) : SailM α := PreSail.PreSailME.run m
-
 def SailME.throw (e : α) : SailME α β := PreSail.PreSailME.throw e
-
 abbrev sailTryCatchE (e : SailME β α) (h : exception → SailME β α) : SailME β α := PreSail.sailTryCatchE e h
-
-end Sail
+def unwrapValue [Inhabited α] (x : SailM α) := PreSail.unwrapValue x

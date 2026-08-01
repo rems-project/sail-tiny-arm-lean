@@ -1,6 +1,7 @@
-import Out.Flow
-import Out.Vector
-import Out.ReadWriteV2
+import SailTinyArmUser.SailTinyArmUser
+import SailTinyArmUser.Vector
+import SailTinyArmUser.Registers
+import SailTinyArmUser.ReadWriteV2
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -8,13 +9,21 @@ set_option linter.unusedVariables false
 set_option match.ignoreUnusedAlts true
 
 open Sail
+open Sail.ArchSem
+
+namespace SailTinyArmUser
+
 open ArchSem
 
-namespace Out.Functions
+open Defs
+namespace Functions
 
+open shift_type
 open option
 open operand
-open move_operand
+open extend_type
+open cond
+open bitwise_op
 open ast
 open VARange
 open TLBIOp
@@ -82,30 +91,48 @@ def base_AccessDescriptor (acctype : AccessType) : AccessDescriptor :=
               partid := 0x0000#16
               pmg := 0x00#8 } }
 
-def create_writeAccessDescriptor (_ : Unit) : AccessDescriptor :=
+/-- Type quantifiers: k_ex21888_ : Bool, k_ex21887_ : Bool -/
+def create_writeAccessDescriptor (release : Bool) (exclusive : Bool) : AccessDescriptor :=
   let accdesc := (base_AccessDescriptor AccessType_GPR)
   let accdesc : AccessDescriptor := { accdesc with write := true }
-  let accdesc : AccessDescriptor := { accdesc with read := false }
-  { accdesc with el := 0b00#2 }
+  let accdesc : AccessDescriptor := { accdesc with relsc := release }
+  let accdesc : AccessDescriptor := { accdesc with exclusive := exclusive }
+  { accdesc with el := CurrentEL }
 
-def create_readAccessDescriptor (_ : Unit) : AccessDescriptor :=
+/-- Type quantifiers: k_ex21891_ : Bool, k_ex21890_ : Bool, k_ex21889_ : Bool -/
+def create_readAccessDescriptor (acquire : Bool) (rcpc : Bool) (exclusive : Bool) : AccessDescriptor :=
   let accdesc := (base_AccessDescriptor AccessType_GPR)
   let accdesc : AccessDescriptor := { accdesc with read := true }
-  let accdesc : AccessDescriptor := { accdesc with write := false }
-  { accdesc with el := 0b00#2 }
+  let accdesc : AccessDescriptor := { accdesc with acqsc := (acquire && (! rcpc)) }
+  let accdesc : AccessDescriptor := { accdesc with acqpc := (acquire && rcpc) }
+  let accdesc : AccessDescriptor := { accdesc with exclusive := exclusive }
+  { accdesc with el := CurrentEL }
+
+/-- Type quantifiers: k_ex21893_ : Bool, k_ex21892_ : Bool -/
+def create_RMWAccessDescriptor (modop : MemAtomicOp) (acquire : Bool) (release : Bool) : AccessDescriptor :=
+  let accdesc := (base_AccessDescriptor AccessType_GPR)
+  let accdesc : AccessDescriptor := { accdesc with read := true }
+  let accdesc : AccessDescriptor := { accdesc with write := true }
+  let accdesc : AccessDescriptor := { accdesc with atomicop := true }
+  let accdesc : AccessDescriptor := { accdesc with acqsc := acquire }
+  let accdesc : AccessDescriptor := { accdesc with relsc := release }
+  let accdesc : AccessDescriptor := { accdesc with el := CurrentEL }
+  { accdesc with modop := modop }
 
 def create_iFetchAccessDescriptor (_ : Unit) : AccessDescriptor :=
   let accdesc := (base_AccessDescriptor AccessType_IFETCH)
   let accdesc : AccessDescriptor := { accdesc with read := true }
   let accdesc : AccessDescriptor := { accdesc with write := false }
-  { accdesc with el := 0b00#2 }
+  { accdesc with el := CurrentEL }
 
 def addr_space_def := ()
 
 /-- Type quantifiers: N : Nat, N > 0 -/
 def read_memory (N : Nat) (addr : (BitVec 64)) (accdesc : AccessDescriptor) : SailM (BitVec (8 * N)) := do
+  let accdesc' := accdesc
+  let accdesc' : AccessDescriptor := { accdesc' with relsc := false }
   let req : (Mem_request N 0 addr_size addr_space AccessDescriptor) :=
-    { access_kind := accdesc
+    { access_kind := accdesc'
       address := (Sail.BitVec.truncate addr addr_size')
       address_space := addr_space_def
       size := N
@@ -126,8 +153,11 @@ def wMem_Addr (addr : (BitVec 64)) : Unit :=
 
 /-- Type quantifiers: N : Nat, N > 0 -/
 def wMem (N : Nat) (addr : (BitVec 64)) (value : (BitVec (8 * N))) (accdesc : AccessDescriptor) : SailM Unit := do
+  let accdesc' := accdesc
+  let accdesc' : AccessDescriptor := { accdesc' with acqsc := false }
+  let accdesc' : AccessDescriptor := { accdesc' with acqpc := false }
   let req : (Mem_request N 0 addr_size addr_space AccessDescriptor) :=
-    { access_kind := accdesc
+    { access_kind := accdesc'
       address := (Sail.BitVec.truncate addr addr_size')
       address_space := addr_space_def
       size := N

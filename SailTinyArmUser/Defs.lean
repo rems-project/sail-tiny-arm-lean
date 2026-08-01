@@ -7,7 +7,11 @@ set_option linter.unusedVariables false
 set_option match.ignoreUnusedAlts true
 
 open Sail
-open ArchSem
+open Sail.ArchSem
+
+namespace SailTinyArmUser
+
+namespace Defs
 
 abbrev bit := (BitVec 1)
 
@@ -314,38 +318,7 @@ inductive Barrier where
 
 abbrev reg_index := Nat
 
-inductive operand where
-  | OperandReg (_ : reg_index)
-  | OperandImm (_ : (BitVec 12))
-  deriving Inhabited, BEq, Repr
-  open operand
-
-structure move_imm_data where
-  imm : (BitVec 16)
-  hw : (BitVec 2)
-  deriving BEq, Inhabited, Repr
-
-inductive move_operand where
-  | MoveReg (_ : reg_index)
-  | MoveImm (_ : move_imm_data)
-  deriving Inhabited, BEq, Repr
-  open move_operand
-
 abbrev datasize := (BitVec 1)
-
-inductive ast where
-  | Load (_ : (Nat × reg_index × reg_index × operand))
-  | Store (_ : (Nat × reg_index × reg_index × operand))
-  | ExclusiveOr (_ : (datasize × reg_index × reg_index × reg_index))
-  | Move (_ : (datasize × reg_index × move_operand))
-  | Add (_ : (datasize × reg_index × reg_index × operand))
-  | Sub (_ : (datasize × reg_index × reg_index × operand))
-  | DataMemoryBarrier (_ : (MBReqDomain × MBReqTypes))
-  | DataSynchronizationBarrier (_ : (MBReqDomain × MBReqTypes))
-  | InstructionSynchronizationBarrier (_ : Unit)
-  | CompareAndBranch (_ : (datasize × reg_index × (BitVec 64)))
-  deriving Inhabited, BEq, Repr
-  open ast
 
 abbrev addr_size : Int := 64
 
@@ -353,7 +326,53 @@ abbrev addr_space := Unit
 
 abbrev abort := Unit
 
+inductive extend_type where | UXTB | UXTH | UXTW | UXTX | SXTB | SXTH | SXTW | SXTX
+  deriving BEq, Inhabited, Repr
+  open extend_type
+
+inductive shift_type where | shift_LSL | shift_LSR | shift_ASR | shift_ROR
+  deriving BEq, Inhabited, Repr
+  open shift_type
+
+inductive operand where
+  | OperandRegExt (_ : (reg_index × extend_type × Nat))
+  | OperandRegShift (_ : (reg_index × shift_type × Nat))
+  | OperandImm (_ : (BitVec 64))
+  deriving Inhabited, BEq, Repr
+  open operand
+
+inductive bitwise_op where | Eor | Or | And
+  deriving BEq, Inhabited, Repr
+  open bitwise_op
+
+inductive cond where | EQ | NE | CS | CC | MI | PL | VS | VC | HI | LS | GE | LT | GT | LE | AL | NV
+  deriving BEq, Inhabited, Repr
+  open cond
+
+inductive ast where
+  | Load (_ : (Nat × reg_index × reg_index × operand × Bool × Bool × Bool))
+  | Store (_ : (Nat × reg_index × reg_index × operand × Bool × (Option reg_index)))
+  | AtomicRMW (_ : (Nat × reg_index × reg_index × reg_index × MemAtomicOp × Bool × Bool))
+  | BitwiseLogic (_ : (datasize × bitwise_op × reg_index × reg_index × operand))
+  | Movz (_ : (datasize × reg_index × (BitVec 16) × Nat))
+  | BitfieldMove (_ : (datasize × Bool × reg_index × reg_index × (BitVec 6) × (BitVec 6)))
+  | AddSub (_ : (datasize × (BitVec 1) × (BitVec 1) × reg_index × reg_index × operand))
+  | DataMemoryBarrier (_ : (MBReqDomain × MBReqTypes))
+  | DataSynchronizationBarrier (_ : (MBReqDomain × MBReqTypes))
+  | InstructionSynchronizationBarrier (_ : Unit)
+  | Nop (_ : Unit)
+  | CompareAndBranch (_ : (datasize × reg_index × (BitVec 64) × Bool))
+  | TestAndBranch (_ : (reg_index × Nat × (BitVec 64) × Bool))
+  | Branch (_ : (BitVec 64))
+  | ConditionalBranch (_ : ((BitVec 64) × cond))
+  | PCRelativeAddress (_ : (Bool × reg_index × (BitVec 64)))
+  | BranchRegister (_ : reg_index)
+  deriving Inhabited, BEq, Repr
+  open ast
+
 inductive Register : Type where
+  | SP_EL0
+  | NZCV
   | R0
   | R1
   | R2
@@ -390,6 +409,8 @@ inductive Register : Type where
 open Register
 
 abbrev RegisterType : Register → Type
+  | .SP_EL0 => (BitVec 64)
+  | .NZCV => (BitVec 4)
   | .R0 => (BitVec 64)
   | .R1 => (BitVec 64)
   | .R2 => (BitVec 64)
@@ -452,12 +473,12 @@ def mem_acc_is_atomic_rmw (acc : AccessDescriptor) : Bool :=
 
 @[reducible]
 instance : Arch where
-  register := Register
-  register_type := RegisterType
   addr_size := addr_size
   addr_space := addr_space
   CHERI := false
   cap_size_log := 0
+  register := Register
+  register_type := RegisterType
   mem_acc := AccessDescriptor
   mem_acc_is_explicit := mem_acc_is_explicit
   mem_acc_is_ifetch := mem_acc_is_ifetch
@@ -476,10 +497,15 @@ instance : Arch where
   tlbi := Unit
   exn := Unit
   sys_reg_id := Unit
+
 abbrev exception := Unit
 
 abbrev SailM := PreSailM exception
 abbrev SailME := PreSailME exception
 
-instance : Inhabited (PreSail.RegisterRef (BitVec 64)) where
+
+
+instance : Inhabited (RegisterRef (BitVec 4)) where
+  default := .Reg NZCV
+instance : Inhabited (RegisterRef (BitVec 64)) where
   default := .Reg _PC

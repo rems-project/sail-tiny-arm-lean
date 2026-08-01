@@ -1,5 +1,9 @@
 import Sail
-import Out.Defs
+import SailTinyArmUser.Defs
+
+namespace SailTinyArmUser
+
+open Defs
 
 abbrev real := Float
 

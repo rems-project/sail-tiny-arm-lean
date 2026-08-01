@@ -1,7 +1,7 @@
 import Sail
-import Out.Defs
-import Out.Specialization
-import Out.FakeReal
+import SailTinyArmUser.Defs
+import SailTinyArmUser.SpecializationArchSem
+import SailTinyArmUser.FakeReal
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -9,13 +9,21 @@ set_option linter.unusedVariables false
 set_option match.ignoreUnusedAlts true
 
 open Sail
+open Sail.ArchSem
+
+namespace SailTinyArmUser
+
 open ArchSem
 
-namespace Out.Functions
+open Defs
+namespace Functions
 
+open shift_type
 open option
 open operand
-open move_operand
+open extend_type
+open cond
+open bitwise_op
 open ast
 open VARange
 open TLBIOp
@@ -44,11 +52,14 @@ open CacheOp
 open Barrier
 open AccessType
 
-/-- Type quantifiers: k_n : Int -/
-def concat_str_bits (str : String) (x : (BitVec k_n)) : String :=
-  (HAppend.hAppend str (BitVec.toFormatted x))
+/-- Type quantifiers: k_ex21247_ : Bool, k_ex21246_ : Bool -/
+def neq_bool (x : Bool) (y : Bool) : Bool :=
+  (! (x == y))
 
-/-- Type quantifiers: x : Int -/
-def concat_str_dec (str : String) (x : Int) : String :=
-  (HAppend.hAppend str (Int.repr x))
+/-- Type quantifiers: k_n : Nat, y : Nat, k_n ≥ 0 ∧ y ≥ 0 -/
+def eq_bits_int (x : (BitVec k_n)) (y : Nat) : Bool :=
+  ((BitVec.toNatInt x) == y)
+
+def neq_bit (x : (BitVec 1)) (y : (BitVec 1)) : Bool :=
+  (! (x == y))
 
