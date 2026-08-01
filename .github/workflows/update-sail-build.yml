@@ -1,6 +1,8 @@
 name: Build Sail Tiny ARM For Lean
 
 on:
+  schedule:
+    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 env:
@@ -72,7 +74,7 @@ jobs:
       id: cache-lake-restore
       uses: actions/cache/restore@v4
       with:
-        path: sail-tiny-arm/lean-snapshot/out/.lake
+        path: sail-tiny-arm/lean-snapshot/SailTinyArmUser/.lake
         key: ${{ matrix.os }}-${{ matrix.version }}
 
 
@@ -86,8 +88,8 @@ jobs:
       run: |
         source ~/.profile
 
-        cp -r README .github .editorconfig sail-tiny-arm/lean-snapshot/out/
-        cd sail-tiny-arm/lean-snapshot/out/
+        cp -r README .github .editorconfig sail-tiny-arm/lean-snapshot/SailTinyArmUser/
+        cd sail-tiny-arm/lean-snapshot/SailTinyArmUser/
         lake update
         lake build | tee build_log.txt
         cd ../../..
@@ -96,7 +98,7 @@ jobs:
       id: cache-lake-save
       uses: actions/cache/save@v4
       with:
-        path: sail-tiny-arm/lean-snapshot/out/.lake
+        path: sail-tiny-arm/lean-snapshot/SailTinyArmUser/.lake
         key: ${{ steps.cache-lake-restore.outputs.cache-primary-key }}
 
     - name: Deploy
@@ -104,7 +106,7 @@ jobs:
       env:
         REPO: self
         BRANCH: main
-        FOLDER: sail-tiny-arm/lean-snapshot/out
+        FOLDER: sail-tiny-arm/lean-snapshot/SailTinyArmUser
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TARGET_DIR: .
 
