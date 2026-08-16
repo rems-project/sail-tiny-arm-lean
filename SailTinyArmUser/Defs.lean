@@ -11,8 +11,6 @@ open Sail.ArchSem
 
 namespace SailTinyArmUser
 
-namespace Defs
-
 abbrev bit := (BitVec 1)
 
 abbrev bits k_n := (BitVec k_n)

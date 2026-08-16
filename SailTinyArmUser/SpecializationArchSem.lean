@@ -5,8 +5,6 @@ open Sail ArchSem
 
 namespace SailTinyArmUser
 
-open Defs
-
 @[simp_sail]
 def sailTryCatch (e : SailM α) (h : exception → SailM α) : SailM α := PreSail.sailTryCatch e h
 

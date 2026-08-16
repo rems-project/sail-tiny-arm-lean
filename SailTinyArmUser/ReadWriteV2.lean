@@ -15,7 +15,6 @@ namespace SailTinyArmUser
 
 open ArchSem
 
-open Defs
 namespace Functions
 
 open shift_type

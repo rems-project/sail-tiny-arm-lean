@@ -3,8 +3,6 @@ import SailTinyArmUser.Defs
 
 namespace SailTinyArmUser
 
-open Defs
-
 abbrev real := Float
 
 -- val "neg_real" : real -> real
