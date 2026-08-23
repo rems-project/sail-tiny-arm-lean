@@ -197,7 +197,7 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                                   let Rn : (BitVec 5) := (Sail.BitVec.extractLsb v__0 9 5)
                                   let Rm : (BitVec 5) := (Sail.BitVec.extractLsb v__0 20 16)
                                   let Rd : (BitVec 5) := (Sail.BitVec.extractLsb v__0 4 0)
-                                  let op ← do (decode_bitwise_op opc)
+                                  let op := (decode_bitwise_op opc)
                                   if (((sf == 0#1) && ((BitVec.access imm6 5) == 1#1)) : Bool)
                                   then
                                     (fail
@@ -221,7 +221,7 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                                       let immr : (BitVec 6) := (Sail.BitVec.extractLsb v__0 21 16)
                                       let Rn : (BitVec 5) := (Sail.BitVec.extractLsb v__0 9 5)
                                       let Rd : (BitVec 5) := (Sail.BitVec.extractLsb v__0 4 0)
-                                      let op ← do (decode_bitwise_op opc)
+                                      let op := (decode_bitwise_op opc)
                                       if (((N == 1#1) && (sf == 0#1)) : Bool)
                                       then (fail "64 bit mask in 32 bit bitwise operation")
                                       else (pure ())

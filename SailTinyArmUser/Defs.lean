@@ -339,7 +339,7 @@ inductive operand where
   deriving Inhabited, BEq, Repr
   open operand
 
-inductive bitwise_op where | Eor | Or | And
+inductive bitwise_op where | Eor | Or | And | AndSetFlags
   deriving BEq, Inhabited, Repr
   open bitwise_op
 

@@ -199,20 +199,22 @@ def eval_operand (size : Nat) (op : operand) : SailM (BitVec size) := do
 def zero_operand := (OperandImm 0x0000000000000000#64)
 
 def undefined_bitwise_op (_ : Unit) : SailM bitwise_op := do
-  (internal_pick [Eor, Or, And])
+  (internal_pick [Eor, Or, And, AndSetFlags])
 
-/-- Type quantifiers: arg_ : Nat, 0 ≤ arg_ ∧ arg_ ≤ 2 -/
+/-- Type quantifiers: arg_ : Nat, 0 ≤ arg_ ∧ arg_ ≤ 3 -/
 def bitwise_op_of_num (arg_ : Nat) : bitwise_op :=
   match arg_ with
   | 0 => Eor
   | 1 => Or
-  | _ => And
+  | 2 => And
+  | _ => AndSetFlags
 
 def num_of_bitwise_op (arg_ : bitwise_op) : Int :=
   match arg_ with
   | .Eor => 0
   | .Or => 1
   | .And => 2
+  | .AndSetFlags => 3
 
 def undefined_cond (_ : Unit) : SailM cond := do
   (internal_pick [EQ, NE, CS, CC, MI, PL, VS, VC, HI, LS, GE, LT, GT, LE, AL, NV])
@@ -262,7 +264,7 @@ def rotate_right (v : (BitVec k_n)) (r : Int) : (BitVec k_n) :=
   then v
   else ((v >>> r) ||| (v <<< ((Sail.BitVec.length v) -i r)))
 
-/-- Type quantifiers: k_ex21901_ : Bool -/
+/-- Type quantifiers: k_ex22019_ : Bool -/
 def decode_bitmask (N : (BitVec 1)) (imms : (BitVec 6)) (immr : (BitVec 6)) (immediate : Bool) : SailM ((BitVec 64) × (BitVec 64)) := do
   let len :=
     if ((N == 1#1) : Bool)
