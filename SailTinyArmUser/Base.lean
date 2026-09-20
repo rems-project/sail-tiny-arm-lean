@@ -180,7 +180,8 @@ def shift_bits_backwards_matches (arg_ : (BitVec 2)) : Bool :=
   | 0b11 => true
   | _ => false
 
-/-- Type quantifiers: amount : Nat, k_N : Nat, k_N ∈ {32, 64}, 0 ≤ amount ∧ amount ≤ 63 -/
+/-- Type quantifiers: amount : Nat, k_N : Nat, List.elem k_N [32, 64], 0 ≤ amount ∧
+  amount ≤ 63 -/
 def shift_reg (v : (BitVec k_N)) (sh : shift_type) (amount : Nat) : SailM (BitVec k_N) := do
   match sh with
   | .shift_LSL => (pure (v <<< amount))
@@ -188,7 +189,7 @@ def shift_reg (v : (BitVec k_N)) (sh : shift_type) (amount : Nat) : SailM (BitVe
   | .shift_ASR => (pure (BitVec.sshiftRight v amount))
   | .shift_ROR => (fail "ROR unsupported")
 
-/-- Type quantifiers: size : Nat, size ∈ {32, 64} -/
+/-- Type quantifiers: size : Nat, List.elem size [32, 64] -/
 def eval_operand (size : Nat) (op : operand) : SailM (BitVec size) := do
   match op with
   | .OperandRegExt (n, ext, shift) =>

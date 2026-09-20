@@ -69,11 +69,11 @@ def rX (n : Nat) : SailM (BitVec 64) := do
   then (reg_deref (GetElem?.getElem! GPRs n))
   else (pure 0x0000000000000000#64)
 
-/-- Type quantifiers: n : Nat, size : Nat, size ∈ {8, 16, 32, 64}, 0 ≤ n ∧ n ≤ 31 -/
+/-- Type quantifiers: n : Nat, size : Nat, List.elem size [8, 16, 32, 64], 0 ≤ n ∧ n ≤ 31 -/
 def rXS (n : Nat) (size : Nat) : SailM (BitVec size) := do
   (pure (Sail.BitVec.extractLsb (← (rX n)) (size -i 1) 0))
 
-/-- Type quantifiers: n : Nat, size : Nat, size ∈ {8, 16, 32, 64}, 0 ≤ n ∧ n ≤ 31 -/
+/-- Type quantifiers: n : Nat, size : Nat, List.elem size [8, 16, 32, 64], 0 ≤ n ∧ n ≤ 31 -/
 def wXS (n : Nat) (size : Nat) (value : (BitVec size)) : SailM Unit := do
   (wX n (Sail.BitVec.zeroExtend value 64))
 
@@ -109,11 +109,11 @@ def rSP (_ : Unit) : SailM (BitVec 64) := do
 def wSP (sp : (BitVec 64)) : SailM Unit := do
   writeReg SP_EL0 sp
 
-/-- Type quantifiers: size : Nat, size ∈ {8, 16, 32, 64} -/
+/-- Type quantifiers: size : Nat, List.elem size [8, 16, 32, 64] -/
 def rSPS (size : Nat) : SailM (BitVec size) := do
   (pure (Sail.BitVec.extractLsb (← (rSP ())) (size -i 1) 0))
 
-/-- Type quantifiers: size : Nat, size ∈ {8, 16, 32, 64} -/
+/-- Type quantifiers: size : Nat, List.elem size [8, 16, 32, 64] -/
 def wSPS (size : Nat) (value : (BitVec size)) : SailM Unit := do
   (wSP (Sail.BitVec.zeroExtend value 64))
 

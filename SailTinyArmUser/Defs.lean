@@ -318,7 +318,7 @@ abbrev reg_index := Nat
 
 abbrev datasize := (BitVec 1)
 
-abbrev addr_size : Int := 64
+abbrev addr_size  : Int := 64
 
 abbrev addr_space := Unit
 
