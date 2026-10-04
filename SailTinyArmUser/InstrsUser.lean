@@ -134,7 +134,7 @@ def decodeAddSubImm (sf : (BitVec 1)) (op : (BitVec 1)) (S : (BitVec 1)) (sh : (
     else (0x0000000000#40 +++ (imm12 +++ 0x000#12))
   (AddSub (sf, op, S, d, n, (OperandImm imm)))
 
-/-- Type quantifiers: k_ex22038_ : Bool -/
+/-- Type quantifiers: k_ex22048_ : Bool -/
 def decodeDataBarrier (CRm : (BitVec 4)) (is_sync : Bool) : SailM ast := do
   let domain : MBReqDomain :=
     match (Sail.BitVec.extractLsb CRm 3 2) with
@@ -261,7 +261,7 @@ def condition_holds (cond : cond) : SailM Bool := do
   | .AL => (pure true)
   | .NV => (pure true)
 
-/-- Type quantifiers: k_ex22041_ : Bool, bit_pos : Nat, t : Nat, 0 ≤ t ∧ t ≤ 31, 0 ≤ bit_pos
+/-- Type quantifiers: k_ex22051_ : Bool, bit_pos : Nat, t : Nat, 0 ≤ t ∧ t ≤ 31, 0 ≤ bit_pos
   ∧ bit_pos ≤ 63 -/
 def execute_TestAndBranch (t : Nat) (bit_pos : Nat) (offset : (BitVec 64)) (iszero : Bool) : SailM Unit := do
   let bit_is_zero ← do (pure ((BitVec.access ((← (rX t)) >>> bit_pos) 0) == 0#1))
@@ -276,7 +276,7 @@ def execute_TestAndBranch (t : Nat) (bit_pos : Nat) (offset : (BitVec 64)) (isze
       (wPC (base + offset)))
   else writeReg _PC (BitVec.addInt (← readReg _PC) 4)
 
-/-- Type quantifiers: k_ex22045_ : Bool, n : Nat, t : Nat, size : Nat, 0 ≤ size ∧ size ≤ 3, 0
+/-- Type quantifiers: k_ex22055_ : Bool, n : Nat, t : Nat, size : Nat, 0 ≤ size ∧ size ≤ 3, 0
   ≤ t ∧ t ≤ 31, 0 ≤ n ∧ n ≤ 31 -/
 def execute_Store (size : Nat) (t : Nat) (n : Nat) (offset : operand) (release : Bool) (s : (Option Nat)) : SailM Unit := SailME.run do
   let exclusive ← (( do
@@ -309,7 +309,7 @@ def execute_Store (size : Nat) (t : Nat) (n : Nat) (offset : operand) (release :
   writeReg _PC (BitVec.addInt (← readReg _PC) 4)
   (wMem (2 ^i size) addr (Sail.BitVec.extractLsb (← (rX t)) ((8 *i (2 ^i size)) -i 1) 0) accdesc)
 
-/-- Type quantifiers: d : Nat, k_ex22046_ : Bool, 0 ≤ d ∧ d ≤ 31 -/
+/-- Type quantifiers: d : Nat, k_ex22056_ : Bool, 0 ≤ d ∧ d ≤ 31 -/
 def execute_PCRelativeAddress (page : Bool) (d : Nat) (offset : (BitVec 64)) : SailM Unit := do
   let base ← (( do
     if (page : Bool)
@@ -331,7 +331,7 @@ def execute_Movz (sf : (BitVec 1)) (d : Nat) (imm : (BitVec 16)) (hw : Nat) : Sa
   let res : (BitVec 64) := ((Sail.BitVec.zeroExtend imm 64) <<< (16 *i hw))
   (wXS d size (Sail.BitVec.extractLsb res (size -i 1) 0))
 
-/-- Type quantifiers: k_ex22055_ : Bool, k_ex22054_ : Bool, k_ex22053_ : Bool, n : Nat, t : Nat, size
+/-- Type quantifiers: k_ex22065_ : Bool, k_ex22064_ : Bool, k_ex22063_ : Bool, n : Nat, t : Nat, size
   : Nat, 0 ≤ size ∧ size ≤ 3, 0 ≤ t ∧ t ≤ 31, 0 ≤ n ∧ n ≤ 31 -/
 def execute_Load (size : Nat) (t : Nat) (n : Nat) (offset : operand) (acquire : Bool) (rcpc : Bool) (exclusive : Bool) : SailM Unit := SailME.run do
   let accdesc := (create_readAccessDescriptor acquire rcpc exclusive)
@@ -369,7 +369,7 @@ def execute_ConditionalBranch (offset : (BitVec 64)) (cond : cond) : SailM Unit 
       (wPC target))
   else (wPC (BitVec.addInt base 4))
 
-/-- Type quantifiers: k_ex22057_ : Bool, t : Nat, 0 ≤ t ∧ t ≤ 31 -/
+/-- Type quantifiers: k_ex22067_ : Bool, t : Nat, 0 ≤ t ∧ t ≤ 31 -/
 def execute_CompareAndBranch (sf : (BitVec 1)) (t : Nat) (offset : (BitVec 64)) (iszero : Bool) : SailM Unit := do
   let size :=
     if ((sf == 1#1) : Bool)
@@ -441,7 +441,7 @@ def execute_BitwiseLogic (sf : (BitVec 1)) (op : bitwise_op) (d : Nat) (n : Nat)
       writeReg NZCV ((BitVec.join1 [n]) +++ ((BitVec.join1 [z]) +++ ((BitVec.join1 [c]) +++ (BitVec.join1 [v])))))
   else (pure ())
 
-/-- Type quantifiers: n : Nat, d : Nat, k_ex22061_ : Bool, 0 ≤ d ∧ d ≤ 31, 0 ≤ n ∧
+/-- Type quantifiers: n : Nat, d : Nat, k_ex22071_ : Bool, 0 ≤ d ∧ d ≤ 31, 0 ≤ n ∧
   n ≤ 31 -/
 def execute_BitfieldMove (sf : (BitVec 1)) (signd : Bool) (d : Nat) (n : Nat) (imms : (BitVec 6)) (immr : (BitVec 6)) : SailM Unit := do
   writeReg _PC (BitVec.addInt (← readReg _PC) 4)
@@ -463,7 +463,7 @@ def execute_BitfieldMove (sf : (BitVec 1)) (signd : Bool) (d : Nat) (n : Nat) (i
     else (BitVec.zero size)
   (wXS d size ((top &&& (Complement.complement tmask)) ||| (bot &&& tmask)))
 
-/-- Type quantifiers: k_ex22069_ : Bool, k_ex22068_ : Bool, n : Nat, t : Nat, s : Nat, var_0 : Nat, 0
+/-- Type quantifiers: k_ex22079_ : Bool, k_ex22078_ : Bool, n : Nat, t : Nat, s : Nat, var_0 : Nat, 0
   ≤ var_0 ∧ var_0 ≤ 3, 0 ≤ s ∧ s ≤ 31, 0 ≤ t ∧ t ≤ 31, 0 ≤ n ∧ n ≤ 31 -/
 def execute_AtomicRMW (var_0 : Nat) (s : Nat) (t : Nat) (n : Nat) (op : MemAtomicOp) (acq : Bool) (rel : Bool) : SailM Unit := SailME.run do
   let size := var_0
