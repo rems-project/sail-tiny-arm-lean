@@ -1,6 +1,5 @@
 import SailTinyArmUser.Flow
 import SailTinyArmUser.Prelude
-import SailTinyArmUser.Registers
 import SailTinyArmUser.Interface
 import SailTinyArmUser.Translation
 import SailTinyArmUser.Base
@@ -324,8 +323,7 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                                                         (let sf := (BitVec.access v__0 31)
                                                         let op := (BitVec.access v__0 30)
                                                         let S := (BitVec.access v__0 29)
-                                                        let sh : (BitVec 1) :=
-                                                          (Sail.BitVec.extractLsb v__0 22 22)
+                                                        let sh := (BitVec.access v__0 22)
                                                         let imm12 : (BitVec 12) :=
                                                           (Sail.BitVec.extractLsb v__0 21 10)
                                                         let Rn : (BitVec 5) :=
@@ -383,10 +381,9 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                                                                                 ()))
                                                                           else
                                                                             (do
-                                                                              match v__0 with
-                                                                              | 0b11010101000000110010000000011111 =>
-                                                                                (pure (Nop ()))
-                                                                              | v__0 =>
+                                                                              if ((v__0 == (0xD503201F#32 : (BitVec 32))) : Bool)
+                                                                              then (pure (Nop ()))
+                                                                              else
                                                                                 (do
                                                                                   if (((Sail.BitVec.extractLsb
                                                                                          v__0 30 25) == (0b011010#6 : (BitVec 6))) : Bool)

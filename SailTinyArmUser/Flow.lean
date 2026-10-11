@@ -51,14 +51,11 @@ open CacheOp
 open Barrier
 open AccessType
 
-/-- Type quantifiers: k_ex21374_ : Bool, k_ex21373_ : Bool -/
+/-- Type quantifiers: k_ex21277_ : Bool, k_ex21276_ : Bool -/
 def neq_bool (x : Bool) (y : Bool) : Bool :=
   (! (x == y))
 
 /-- Type quantifiers: k_n : Nat, y : Nat, k_n ≥ 0 ∧ y ≥ 0 -/
 def eq_bits_int (x : (BitVec k_n)) (y : Nat) : Bool :=
   ((BitVec.toNatInt x) == y)
-
-def neq_bit (x : (BitVec 1)) (y : (BitVec 1)) : Bool :=
-  (! (x == y))
 

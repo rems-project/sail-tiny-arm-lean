@@ -1,4 +1,3 @@
-import SailTinyArmUser.Registers
 import SailTinyArmUser.TinyArm
 
 set_option maxHeartbeats 1_000_000_000

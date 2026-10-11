@@ -56,8 +56,3 @@ def fail (message : String) : SailM k_a := do
   assert false message
   throw Error.Exit
 
-def not_bit (b : (BitVec 1)) : (BitVec 1) :=
-  if ((b == 0#1) : Bool)
-  then 1#1
-  else 0#1
-
