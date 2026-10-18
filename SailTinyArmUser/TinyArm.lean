@@ -139,8 +139,8 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                           let n : reg_index := (BitVec.toNatInt Rn)
                           let s : reg_index := (BitVec.toNatInt Rs)
                           let release := (o0 == 1#1)
-                          assert (s != t) "Store exclusive can't store value and success to same register"
-                          assert ((s == 31) || (s != n)) "Store exclusive success can't be stored to address register"
+                          sail_assert (s != t) "Store exclusive can't store value and success to same register"
+                          sail_assert ((s == 31) || (s != n)) "Store exclusive success can't be stored to address register"
                           (pure (Store (size, t, n, zero_operand, release, (some s)))))
                       else
                         (do
@@ -162,7 +162,7 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                               let s : reg_index := (BitVec.toNatInt Rs)
                               let t : reg_index := (BitVec.toNatInt Rt)
                               let n : reg_index := (BitVec.toNatInt Rn)
-                              assert (s != t) "sail-tiny-arm doesn't support RMW atomic with twice the same destination register"
+                              sail_assert (s != t) "sail-tiny-arm doesn't support RMW atomic with twice the same destination register"
                               let op ← (( do
                                 if ((o3 == 1#1) : Bool)
                                 then
@@ -264,10 +264,10 @@ def decode (v__0 : (BitVec 32)) : SailM ast := do
                                                 (Sail.BitVec.extractLsb v__0 4 0)
                                               let d : reg_index := (BitVec.toNatInt Rd)
                                               let n : reg_index := (BitVec.toNatInt Rn)
-                                              assert (sf == N) "xBFM mask sizes doesn't match operation size"
+                                              sail_assert (sf == N) "xBFM mask sizes doesn't match operation size"
                                               if ((sf == 0#1) : Bool)
                                               then
-                                                assert (((BitVec.access imms 5) == 0#1) && ((BitVec.access
+                                                sail_assert (((BitVec.access imms 5) == 0#1) && ((BitVec.access
                                                       immr 5) == 0#1)) "32bit xBFM has masks larger than 32 bits"
                                               else (pure ())
                                               let signd ← (( do

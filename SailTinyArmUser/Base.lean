@@ -271,12 +271,12 @@ def decode_bitmask (N : (BitVec 1)) (imms : (BitVec 6)) (immr : (BitVec 6)) (imm
     if ((N == 1#1) : Bool)
     then 6
     else (5 -i (BitVec.countLeadingZeros (Complement.complement imms)))
-  assert (len >b 0) "Invalid immediate encoding for bitwise operation"
+  sail_assert (len >b 0) "Invalid immediate encoding for bitwise operation"
   let s := (BitVec.toNatInt (Sail.BitVec.extractLsb imms (len -i 1) 0))
   let r := (BitVec.toNatInt (Sail.BitVec.extractLsb immr (len -i 1) 0))
   if (immediate : Bool)
   then
-    assert ((s +i 1) <b (2 ^i len)) "All-ones mask is not allowed in immediate bitwise operations"
+    sail_assert ((s +i 1) <b (2 ^i len)) "All-ones mask is not allowed in immediate bitwise operations"
   else (pure ())
   let welem := (Sail.BitVec.zeroExtend (sail_ones (s +i 1)) (2 ^i len))
   let relem := (rotate_right welem r)

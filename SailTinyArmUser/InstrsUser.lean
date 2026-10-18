@@ -451,7 +451,7 @@ def execute_BitfieldMove (sf : (BitVec 1)) (signd : Bool) (d : Nat) (n : Nat) (i
     else 32
   let s := (BitVec.toNatInt imms)
   let r := (BitVec.toNatInt immr)
-  assert (s <b size) "instrs-user.sail:365.31-365.32"
+  sail_assert (s <b size) "instrs-user.sail:365.31-365.32"
   let (wmask, tmask) ← do (decode_bitmask sf imms immr false)
   let wmask := (Sail.BitVec.extractLsb wmask (size -i 1) 0)
   let tmask := (Sail.BitVec.extractLsb tmask (size -i 1) 0)

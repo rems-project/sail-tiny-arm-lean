@@ -53,6 +53,6 @@ open AccessType
 
 /-- Type quantifiers: k_a : Type -/
 def fail (message : String) : SailM k_a := do
-  assert false message
+  sail_assert false message
   throw Error.Exit
 
